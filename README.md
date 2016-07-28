@@ -8,6 +8,7 @@ Instructions:
 *Install python 2.7.12 from here: https://www.python.org/downloads/
 
 *After install, copy requirements.txt to c:\python27\scripts, open command prompt and type pip install -r requirements.txt
+--if you get an error installing flask, run this command and retry installing the requirements: pip install setuptools==21.2.1
 
 *Edit \pogo\snipe.bat with your auth type, username, password and current location (if using google, you MUST put your gmail address / password in the bat file for it to authenticate)
 
