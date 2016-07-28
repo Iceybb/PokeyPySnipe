@@ -5,9 +5,10 @@ works by teleporting to the location of the pokemon, engaging it, teleporting ba
 and then capturing it. This does NOT trigger a soft ban.
 
 Instructions:
+*Install python 2.7.12 from here: https://www.python.org/downloads/
 
-*Pip install -r requirements.txt
+*After install, copy requirements.txt to c:\python27\scripts, open command prompt and type pip install -r requirements.txt
 
-*Edit snipe.bat with your auth type, username, password and current location
+*Edit \pogo\snipe.bat with your auth type, username, password and current location
 
 *Run snipe.bat and paste coordinates in the following format: lat,lng - profit!
