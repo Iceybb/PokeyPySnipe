@@ -162,7 +162,11 @@ def getInventory(session):
 
 def doSnipe(session,args):
     if session:
-        snipeLoc = raw_input('Please paste target location (format is lat,lng)!: ')
+	
+        if args.zslocation:
+            snipeLoc = args.zslocation
+        else:
+            snipeLoc = raw_input('Please paste target location (format is lat,lng)!: ')
         snipeLocSplit = snipeLoc.split(",")
         # General
         #getProfile(session)
@@ -189,14 +193,14 @@ def doSnipe(session,args):
 			
 			#Encounter pokemon
             remoteEncounter = session.encounterPokemon(pokeMon)
-            time.sleep(1) 
+            time.sleep(2) 
             
 						
 			#move back home to capture
             session.setCoordinates(prevLatitude,prevLongitude)
 			
 			#Wait for move to complete
-            time.sleep(1)
+            time.sleep(2)
             
             snipe = snipeABitch(session, pokeMon, remoteEncounter)
             if snipe.status != 3:
@@ -206,10 +210,10 @@ def doSnipe(session,args):
                         logging.info(pokez)
                     
             #logging.critical(snipe.captured_pokemon_id)
-			
-            reDo = raw_input('Shall we do this again(yes or no)?')
-            if reDo.upper() == "YES":
-                doSnipe(session,args)
+            if args.zslocation == False:
+                reDo = raw_input('Shall we do this again(yes or no)?')
+                if reDo.upper() == "YES":
+                    doSnipe(session,args)
     else:
         logging.critical('Session not created successfully')
 
@@ -224,9 +228,11 @@ if __name__ == '__main__':
     parser.add_argument("-u", "--username", help="Username", required=True)
     parser.add_argument("-p", "--password", help="Password", required=True)
     parser.add_argument("-l", "--location", help="Location")
+    parser.add_argument("-z", "--zslocation", help="Lat")
     parser.add_argument("-g", "--geo_key", help="GEO API Secret")
+	
     args = parser.parse_args()
-
+    logging.info(str(args.zslocation))
     # Check service
     if args.auth not in ['ptc', 'google']:
         logging.error('Invalid auth service {}'.format(args.auth))
@@ -249,6 +255,7 @@ if __name__ == '__main__':
         session = poko_session.authenticate()
 
     # Time to show off what we can do
+	
     doSnipe(session,args)
 	
 
