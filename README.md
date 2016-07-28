@@ -12,3 +12,7 @@ Instructions:
 *Edit \pogo\snipe.bat with your auth type, username, password and current location (if using google, you MUST put your gmail address / password in the bat file for it to authenticate)
 
 *Run snipe.bat and paste coordinates in the following format: lat,lng - profit!
+
+***ADDED A WEB SERVER FOR REMOTE SNIPING***
+
+Run 'start webserver.bat' and navigate to http://localhost:5100 (or your external IP if you have port forwarding setup) and fill in the prompts, it allows for sniping on the go. Alternatively, if you wanted to pass arguments to the bat for integration in to another service, you can do so as follows: snipeParam "ptc or google" "username" "password" "start loc" "snipe coords (format 123.000000,123.00000)
