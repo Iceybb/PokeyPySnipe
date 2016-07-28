@@ -1,0 +1,1 @@
+snipe.py -a "ptc" -u "username" -p "password" -l "your current location"
