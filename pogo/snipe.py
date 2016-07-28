@@ -203,7 +203,7 @@ def doSnipe(session,args):
                 logging.info("Heres what we caught:\n")
                 for pokez in session.getInventory().party:
                     if pokez.id == snipe.captured_pokemon_id:
-                        print pokez
+                        logging.info(pokez)
                     
             #logging.critical(snipe.captured_pokemon_id)
 			
