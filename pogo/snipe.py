@@ -189,6 +189,7 @@ def doSnipe(session,args):
             pokeMon = findBestPokemon(session,args)
             
             if pokeMon == None:
+                session.setCoordinates(prevLatitude,prevLongitude)
                 return
 			
 			#Encounter pokemon
