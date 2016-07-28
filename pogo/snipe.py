@@ -10,6 +10,38 @@ from location import Location
 
 from pokedex import pokedex
 from inventory import items
+from flask import Flask
+from flask import request
+from flask import render_template
+from flask import redirect, url_for
+from flask import jsonify
+import thread
+import subprocess
+import os
+import sys
+app = Flask(__name__)
+
+@app.route('/_snipe_')
+def remote_Snipe():
+    #authtype = request.args.get('authtype', 0)
+    #username = request.args.get('username', 0)
+    #password = request.args.get('password', 0)
+    #startingloc = request.args.get('startingloc', 0)
+    snipecoords = request.args.get('snipecoords', 0)
+    doSnipe(session,args,snipecoords)
+   
+    
+    #workDir = os.path.dirname(os.path.realpath(sys.argv[0]))
+    #subprocess.Popen([workDir + r'\snipeparam.bat',authtype,username,password,str(startingloc),str(snipecoords)], creationflags = subprocess.CREATE_NEW_CONSOLE)
+    
+    return render_template('dashboard.html')
+
+
+@app.route('/')
+def index():
+    return render_template('dashboard.html')
+
+
 
 def setupLogger():
     logger = logging.getLogger()
@@ -160,13 +192,13 @@ def getInventory(session):
     logging.info(session.getInventory())
 
 
-def doSnipe(session,args):
+def doSnipe(session,args,snipeLoc):
     if session:
 	
-        if args.zslocation:
-            snipeLoc = args.zslocation
-        else:
-            snipeLoc = raw_input('Please paste target location (format is lat,lng)!: ')
+        #if args.zslocation:
+            #snipeLoc = args.zslocation
+        #else:
+            #snipeLoc = raw_input('Please paste target location (format is lat,lng)!: ')
         snipeLocSplit = snipeLoc.split(",")
         # General
         #getProfile(session)
@@ -199,7 +231,7 @@ def doSnipe(session,args):
 						
 			#move back home to capture
             session.setCoordinates(prevLatitude,prevLongitude)
-			
+            logging.info("Encountered pokemon - moving back to start location to catch.")
 			#Wait for move to complete
             time.sleep(2)
             
@@ -211,15 +243,17 @@ def doSnipe(session,args):
                         logging.info(pokez)
                     
             #logging.critical(snipe.captured_pokemon_id)
-            if args.zslocation == False:
-                reDo = raw_input('Shall we do this again(yes or no)?')
-                if reDo.upper() == "YES":
-                    doSnipe(session,args)
+            #if args.zslocation == False:
+             #   reDo = raw_input('Shall we do this again(yes or no)?')
+              #  if reDo.upper() == "YES":
+               #     doSnipe(session,args)
     else:
         logging.critical('Session not created successfully')
 
 		
 if __name__ == '__main__':
+    
+	
     setupLogger()
     logging.debug('Logger set up')
 
@@ -256,7 +290,8 @@ if __name__ == '__main__':
         session = poko_session.authenticate()
 
     # Time to show off what we can do
+    logging.info("Successfully logged in to Pokemon Go! Starting web server on port 5100.")
+    app.run(host='0.0.0.0', port=5100)
+    	
+    
 	
-    doSnipe(session,args)
-	
-
