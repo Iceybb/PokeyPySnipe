@@ -9,6 +9,6 @@ Instructions:
 
 *After install, copy requirements.txt to c:\python27\scripts, open command prompt and type pip install -r requirements.txt
 
-*Edit \pogo\snipe.bat with your auth type, username, password and current location
+*Edit \pogo\snipe.bat with your auth type, username, password and current location (if using google, you MUST put your gmail address / password in the bat file for it to authenticate)
 
 *Run snipe.bat and paste coordinates in the following format: lat,lng - profit!
