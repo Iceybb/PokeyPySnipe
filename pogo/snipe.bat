@@ -1,1 +1,1 @@
-snipe.py -a "ptc" -u "earshmode" -p "boradore" -l "2050 Dawn Dr, 97527"
+snipe.py -a "ptc" -u "user" -p "password" -l "central park, ny"
