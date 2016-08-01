@@ -2,6 +2,7 @@ from geopy.geocoders import GoogleV3
 from s2sphere import CellId, LatLng
 from custom_exceptions import GeneralPogoException
 import gpxpy.geo
+import time
 
 
 # Wrapper for location
@@ -74,6 +75,7 @@ class Location(object):
             walk.append(left.id())
             right = right.next()
             left = left.prev()
+            time.sleep(0.3)
 
         # Return everything
         return sorted(walk)
