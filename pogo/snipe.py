@@ -67,7 +67,7 @@ def getProfile(session):
 
 
 # Grab the nearest pokemon details
-def findBestPokemon(session,args):
+def findBestPokemon(session,args,firstTry):
     # Get Map details and print pokemon
     logging.info("Finding Nearby Pokemon:")
     cells = session.getMapObjects()
@@ -117,8 +117,11 @@ def findBestPokemon(session,args):
                 'status': 'Did not find any pokemon @ given location.'
                 }]
         json.dump(data, open('static/catch_data.json', 'w'))
-        time.sleep(1)
-        logging.info("Sorry charlie, no Pokemon here. Enter a new location.")
+        if firstTry == True:
+            logging.info("Didn't find any, but sometimes this is a bug - let's retry.")
+            pokemonBest = findBestPokemon(session,args,False)
+        else:    
+            logging.info("Sorry charlie, no Pokemon here. Enter a new location.")
         
     return pokemonBest
 
@@ -234,7 +237,7 @@ def doSnipe(session,args,snipeLoc):
             session.setCoordinates(snipeLatitude,snipeLongitude)
 			
 			#Search snipe location for most powerful pokemon
-            pokeMon = findBestPokemon(session,args)
+            pokeMon = findBestPokemon(session,args,True)
             
             if pokeMon == None:
                 session.setCoordinates(prevLatitude,prevLongitude)
