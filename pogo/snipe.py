@@ -169,7 +169,8 @@ def snipeABitch(session, pokemon, encounter, thresholdP=0.5, limit=10, delay=2):
             # if no alt ball, there are no balls
             elif altBall == items.UNKNOWN:
                 data = [{
-                'status': 'Fail. Out of usable balls!'
+                'status': 'fail',
+                'message': 'Out of usable balls'
                 }]
                 json.dump(data, open('static/catch_data.json', 'w'))
                 time.sleep(1)
@@ -259,8 +260,7 @@ def doSnipe(session,args,snipeLoc):
             if snipe.status == 3:
                 data = [{
                 'status': 'fail',
-                'pokemon_name': pokedex[pokeMon.pokemon_id],
-                'pokemon_id': pokeMon.pokemon_id
+                'message': 'Pokemon fled'
                 }]
                         
                 json.dump(data, open('static/catch_data.json', 'w'))
