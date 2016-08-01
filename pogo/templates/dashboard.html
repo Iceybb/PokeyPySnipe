@@ -1,70 +1,106 @@
 <html>
+
 <head>
-<title>PokeyPySnipe Dashboard</title>
-<meta http-equiv="pragma" content="no-cache">
-<meta http-equiv="expires" content="-1">
-<script type=text/javascript>
-function updateStatus() {
-document.getElementById('status').innerHTML = ('<center><font size=5 color=red><b>Attempting to snipe Pokemon. This may take some time.</center></font></b>');
-}
-</script>
+    <title>PokeyPySnipe Dashboard</title>
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="expires" content="-1">
+    <script type=text/javascript>
+        function updateStatus() {
+            document.getElementById('status').innerHTML = ('<center><font size=4 color=Orange><b>Attempting to snipe Pokemon. This may take some time.</center></font></b>');
+        }
+    </script>
 
-
+    <style>
+        input[type=text],
+        select {
+            width: 100%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            display: inline-block;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        
+        input[type=submit] {
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            padding: 14px 20px;
+            margin: 8px 0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        
+        input[type=submit]:hover {
+            background-color: #45a049;
+        }
+        
+        div {
+            width: 200px;
+            margin: 0 auto;
+            border-radius: 5px;
+            background-color: #f2f2f2;
+            padding: 20px;
+        }
+    </style>
 </head>
 
 
 <body>
 
-    
-    <center>
-	
+    <div>
+        <center>
+            <form action="_snipe_">
+
+                <font face="arial" size=3><b>PokeyPySnipe</font></b>
+                    <br>
+                    <br>
+                    <br>
+
+                    <font face="arial" size=2><b>Snipe Coords</font></b>
+                        <br> (123.456789,123.456789)
+                        <br><input type="text" name=snipecoords id="snipecoords">
+                        <br>
+                        <br>
+						<font face="arial" size=2><b>Pokemon Name</font></b>(Optional)
+                        
+                        <br><input type="text" name=pokemonName id="pokemonName">
+                        <br>
+                        <br>
+                        <input width="50" type=submit value="Snipe!" onclick='javascript:updateStatus();'>
+
+
+                        <br>
+            </form>
+    </div>
+    <div id="status"></div>
 
 
 
-		<font face="arial" size=3><b> PokeyPySnipe</font></b>
-		<br>
-        <br>
-		<br>
-
-        <form action="_snipe_">
-            
-            
-            
-			 <b>Snipe Coords</b>
-			 <br>
-			 (123.456789,123.456789)<br><input type="text" name=snipecoords id="snipecoords">
-			<br>
-			<br>
-            <input width="50" type=submit value="Snipe!" onclick ='javascript:updateStatus();'>
 
 
-            <br>
-        </form>
-        
     </center>
-<script type="text/javascript">
-function loadJSON(path, success, error)
-{
-    var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function()
-    {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-                if (success)
-                    success(JSON.parse(xhr.responseText));
-            } else {
-                if (error)
-                    error(xhr);
-            }
+    <script type="text/javascript">
+        function loadJSON(path, success, error) {
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        if (success)
+                            success(JSON.parse(xhr.responseText));
+                    } else {
+                        if (error)
+                            error(xhr);
+                    }
+                }
+            };
+            xhr.open("GET", path, true);
+            xhr.send();
         }
-    };
-    xhr.open("GET", path, true);
-    xhr.send();
-}
+    </script>
 
-
-</script>
-<div id="status"></div>
 </body>
 
 </html>
