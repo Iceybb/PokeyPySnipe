@@ -1,44 +1,22 @@
 <html>
 <head>
-<title>PokeyPySnipe Dashboard</title>
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="expires" content="-1">
-
-
-
 </head>
 
 
 <body>
 
     
-    <center>
-	
 
-
-
-		<font face="arial" size=3><b> PokeyPySnipe</font></b>
-		<br>
-        <br>
-		<br>
-
-        <form action="_snipe_">
-            
-            
-            
-			 <b>Snipe Coords</b>
-			 <br>
-			 (123.456789,123.456789)<br><input type="text" name=snipecoords id="snipecoords">
-			<br>
-			<br>
-            <input width="50" type=submit value="Snipe!">
-
-
-            <br>
-        </form>
-        
-    </center>
 <script type="text/javascript">
+<!--
+redirectTime = "3500";
+redirectURL = "http://localhost:5100";
+function timedRedirect() {
+	setTimeout("location.href = redirectURL;",redirectTime);
+}
+//   -->
 function loadJSON(path, success, error)
 {
     var xhr = new XMLHttpRequest();
@@ -57,7 +35,11 @@ function loadJSON(path, success, error)
     xhr.open("GET", path, true);
     xhr.send();
 }
-
+var url = "/static/catch_data.json?" + new Date().getTime();
+loadJSON(url,
+         function(data) {document.getElementById('status').innerHTML = ('<center><font size=5><b>Status: ' + data[0].status) + '</b>  <i>Redirecting in 4 seconds</i></center></font>'; timedRedirect();},
+         function(xhr) { console.error(xhr); }
+);
 
 </script>
 <div id="status"></div>
