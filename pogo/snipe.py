@@ -109,7 +109,6 @@ def findBestPokemon(session,args):
         logging.info(pokedex[pokemonBest.pokemon_data.pokemon_id] + " appears to be the rarest Pokemon @ location. Let's catch him!")
     else:
         logging.info("Sorry charlie, no Pokemon here. Enter a new location.")
-        doSnipe(session,args)
     return pokemonBest
 
 
