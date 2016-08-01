@@ -11,9 +11,8 @@
 
 <script type="text/javascript">
 <!--
-redirectTime = "3500";
 redirectURL = "http://localhost:5100";
-function timedRedirect() {
+function timedRedirect(redirectTime) {
 	setTimeout("location.href = redirectURL;",redirectTime);
 }
 //   -->
@@ -35,9 +34,31 @@ function loadJSON(path, success, error)
     xhr.open("GET", path, true);
     xhr.send();
 }
+
+function sculpt(data)
+{
+var status = data[0].status
+var message = data[0].message
+
+if (status == 'fail')
+	{
+		document.getElementById('status').innerHTML = ('<center><font size=5><b>Status: ' + message + '</b>  <i>Redirecting in 4 seconds</i></center></font>'); 
+		timedRedirect(3500);
+	
+	}
+	else {
+	var id = data[0].pokemon_id
+	
+	document.getElementById('status').innerHTML = ('<center><img src=static/avatars/' + id + '.png width=400 height=400><br><font size=5><b>Status: ' + status + '</b>  <i>Redirecting in 5 seconds</i></center></font>'); 
+	timedRedirect(5000);
+	}
+
+
+
+}
 var url = "/static/catch_data.json?" + new Date().getTime();
 loadJSON(url,
-         function(data) {document.getElementById('status').innerHTML = ('<center><font size=5><b>Status: ' + data[0].status) + '</b>  <i>Redirecting in 4 seconds</i></center></font>'; timedRedirect();},
+         function(data) {sculpt(data); },
          function(xhr) { console.error(xhr); }
 );
 
