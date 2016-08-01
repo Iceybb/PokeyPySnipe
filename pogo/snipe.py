@@ -31,7 +31,8 @@ def remote_Snipe():
     #password = request.args.get('password', 0)
     #startingloc = request.args.get('startingloc', 0)
     snipecoords = request.args.get('snipecoords', 0)
-    doSnipe(session,args,snipecoords)
+    pokemonName = request.args.get('pokemonName', 0)
+    doSnipe(session,args,snipecoords,pokemonName)
    
     
     #workDir = os.path.dirname(os.path.realpath(sys.argv[0]))
@@ -67,14 +68,14 @@ def getProfile(session):
 
 
 # Grab the nearest pokemon details
-def findBestPokemon(session,args,firstTry):
+def findBestPokemon(session,args,firstTry,pokemonName):
     # Get Map details and print pokemon
     logging.info("Finding Nearby Pokemon:")
     cells = session.getMapObjects()
     closest = float("Inf")
     best = -1
     pokemonBest = None
-
+    
     latitude, longitude, _ = session.getCoordinates()
     logging.info("Current pos: %f, %f" % (latitude, longitude))
     for cell in cells.map_cells:
@@ -85,7 +86,10 @@ def findBestPokemon(session,args,firstTry):
             pokemonId = getattr(pokemon, "pokemon_id", None)
             if not pokemonId:
                 pokemonId = pokemon.pokemon_data.pokemon_id
-
+            if pokedex[pokemonId].upper() == pokemonName.upper():
+                pokemonBest = pokemon
+                logging.info("Hey, we found the Pokemon you looks for!")
+                break
             # Find distance to pokemon
             dist = Location.getDistance(
                 latitude,
@@ -111,7 +115,12 @@ def findBestPokemon(session,args,firstTry):
                 pokemonBest = pokemon
                 closest = dist
     if pokemonBest != None:
-        logging.info(pokedex[pokemonBest.pokemon_data.pokemon_id] + " appears to be the rarest Pokemon @ location. Let's catch him!")
+        if pokemonName != 'any':
+            if pokemonName.upper() != str(pokedex[pokemonBest.pokemon_data.pokemon_id]).upper():
+                pokemonBest = None
+                logging.info("Couldn't find specific Pokemon @ this location.")
+        else:
+            logging.info(pokedex[pokemonBest.pokemon_data.pokemon_id] + " appears to be the rarest Pokemon @ location. Let's catch him!")
     else:
         data = [{
                 'status': 'Did not find any pokemon @ given location.'
@@ -119,7 +128,7 @@ def findBestPokemon(session,args,firstTry):
         json.dump(data, open('static/catch_data.json', 'w'))
         if firstTry == True:
             logging.info("Didn't find any, but sometimes this is a bug - let's retry.")
-            pokemonBest = findBestPokemon(session,args,False)
+            pokemonBest = findBestPokemon(session,args,False,pokemonName)
         else:    
             logging.info("Sorry charlie, no Pokemon here. Enter a new location.")
         
@@ -212,7 +221,9 @@ def getInventory(session):
     logging.info(session.getInventory())
 
 
-def doSnipe(session,args,snipeLoc):
+def doSnipe(session,args,snipeLoc,pokemonName):
+    if pokemonName == "":
+        pokemonName = 'any'
     if session:
 	
         #if args.zslocation:
@@ -238,7 +249,7 @@ def doSnipe(session,args,snipeLoc):
             session.setCoordinates(snipeLatitude,snipeLongitude)
 			
 			#Search snipe location for most powerful pokemon
-            pokeMon = findBestPokemon(session,args,True)
+            pokeMon = findBestPokemon(session,args,True,pokemonName)
             
             if pokeMon == None:
                 session.setCoordinates(prevLatitude,prevLongitude)
@@ -247,6 +258,7 @@ def doSnipe(session,args,snipeLoc):
 			
 			#Encounter pokemon
             remoteEncounter = session.encounterPokemon(pokeMon)
+            logging.info(remoteEncounter)
             time.sleep(2) 
             
 						
