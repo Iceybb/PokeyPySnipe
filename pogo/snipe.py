@@ -3,6 +3,7 @@ import argparse
 import logging
 import time
 import sys
+import json
 from custom_exceptions import GeneralPogoException
 
 from api import PokeAuthSession
@@ -240,6 +241,8 @@ def doSnipe(session,args,snipeLoc):
                 for pokez in session.getInventory().party:
                     if pokez.id == snipe.captured_pokemon_id:
                         logging.info(pokez)
+                        data = logging.info(pokez)
+                        json.dump(data, open('demo_data.json', 'w'))
                     
             #logging.critical(snipe.captured_pokemon_id)
             #if args.zslocation == False:
