@@ -42,14 +42,14 @@ var message = data[0].message
 
 if (status == 'fail')
 	{
-		document.getElementById('status').innerHTML = ('<center><font size=5><b>Status: ' + message + '</b>  <i>Redirecting in 4 seconds</i></center></font>'); 
+		document.getElementById('status').innerHTML = ('<center><font size=5 color=red><b>' + message + '</b>  <i>Redirecting in 4 seconds</i></center></font>'); 
 		timedRedirect(3500);
 	
 	}
 	else {
 	var id = data[0].pokemon_id
 	
-	document.getElementById('status').innerHTML = ('<center><img src=static/avatars/' + id + '.png width=400 height=400><br><font size=5><b>Status: ' + status + '</b>  <i>Redirecting in 5 seconds</i></center></font>'); 
+	document.getElementById('status').innerHTML = ('<center><img src=static/avatars/' + id + '.png width=400 height=400><br><font size=5 color=green><b>Status: ' + status + '</b>  <i>Redirecting in 5 seconds</i></center></font>'); 
 	timedRedirect(5000);
 	}
 

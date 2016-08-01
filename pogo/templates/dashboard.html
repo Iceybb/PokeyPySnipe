@@ -3,7 +3,11 @@
 <title>PokeyPySnipe Dashboard</title>
 <meta http-equiv="pragma" content="no-cache">
 <meta http-equiv="expires" content="-1">
-
+<script type=text/javascript>
+function updateStatus() {
+document.getElementById('status').innerHTML = ('<center><font size=5 color=red><b>Attempting to snipe Pokemon. This may take some time.</center></font></b>');
+}
+</script>
 
 
 </head>
@@ -31,7 +35,7 @@
 			 (123.456789,123.456789)<br><input type="text" name=snipecoords id="snipecoords">
 			<br>
 			<br>
-            <input width="50" type=submit value="Snipe!">
+            <input width="50" type=submit value="Snipe!" onclick ='javascript:updateStatus();'>
 
 
             <br>
