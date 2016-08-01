@@ -4,6 +4,7 @@ import logging
 import time
 import sys
 import json
+
 from custom_exceptions import GeneralPogoException
 
 from api import PokeAuthSession
@@ -24,6 +25,7 @@ app = Flask(__name__)
 
 @app.route('/_snipe_')
 def remote_Snipe():
+    
     #authtype = request.args.get('authtype', 0)
     #username = request.args.get('username', 0)
     #password = request.args.get('password', 0)
@@ -35,14 +37,16 @@ def remote_Snipe():
     #workDir = os.path.dirname(os.path.realpath(sys.argv[0]))
     #subprocess.Popen([workDir + r'\snipeparam.bat',authtype,username,password,str(startingloc),str(snipecoords)], creationflags = subprocess.CREATE_NEW_CONSOLE)
     
-    return render_template('dashboard.html')
-
+    return render_template('result.html')
 
 @app.route('/')
 def index():
     return render_template('dashboard.html')
 
 
+@app.errorhandler(500)
+def page_not_found(e):
+    return render_template('result.html'), 404
 
 def setupLogger():
     logger = logging.getLogger()
@@ -109,7 +113,13 @@ def findBestPokemon(session,args):
     if pokemonBest != None:
         logging.info(pokedex[pokemonBest.pokemon_data.pokemon_id] + " appears to be the rarest Pokemon @ location. Let's catch him!")
     else:
+        data = [{
+                'status': 'Did not find any pokemon @ given location.'
+                }]
+        json.dump(data, open('static/catch_data.json', 'w'))
+        time.sleep(1)
         logging.info("Sorry charlie, no Pokemon here. Enter a new location.")
+        
     return pokemonBest
 
 
@@ -155,7 +165,13 @@ def snipeABitch(session, pokemon, encounter, thresholdP=0.5, limit=10, delay=2):
 
             # if no alt ball, there are no balls
             elif altBall == items.UNKNOWN:
+                data = [{
+                'status': 'Fail. Out of usable balls!'
+                }]
+                json.dump(data, open('static/catch_data.json', 'w'))
+                time.sleep(1)
                 raise GeneralPogoException("Out of usable balls")
+                
             else:
                 bestBall = altBall
 
@@ -174,7 +190,7 @@ def snipeABitch(session, pokemon, encounter, thresholdP=0.5, limit=10, delay=2):
 
         # CATCH_FLEE is bad news
         if attempt.status == 3:
-            logging.info("Pokemon fleed - possible soft ban.")
+            logging.info("Pokemon fled - possible soft ban.")
             return attempt
 
         # Only try up to x attempts
@@ -222,6 +238,7 @@ def doSnipe(session,args,snipeLoc):
             
             if pokeMon == None:
                 session.setCoordinates(prevLatitude,prevLongitude)
+                render_template("result.html")
                 return
 			
 			#Encounter pokemon
@@ -236,14 +253,29 @@ def doSnipe(session,args,snipeLoc):
             time.sleep(2)
             
             snipe = snipeABitch(session, pokeMon, remoteEncounter)
+            if snipe.status == 3:
+                data = [{
+                'status': 'fail',
+                'pokemon_name': pokedex[pokeMon.pokemon_id],
+                'pokemon_id': pokeMon.pokemon_id
+                }]
+                        
+                json.dump(data, open('static/catch_data.json', 'w'))
+                time.sleep(1)
             if snipe.status != 3:
                 logging.info("Heres what we caught:\n")
                 for pokez in session.getInventory().party:
                     if pokez.id == snipe.captured_pokemon_id:
                         logging.info(pokez)
-                        data = logging.info(pokez)
-                        json.dump(data, open('demo_data.json', 'w'))
-                    
+                        
+                        data = [{
+                        'status': 'Success. Caught a ' + pokedex[pokez.pokemon_id] + ' CP:' + str(pokez.cp),
+                        'pokemon_name': pokedex[pokez.pokemon_id],
+                        'pokemon_id': pokez.pokemon_id
+
+                               }]
+                        json.dump(data, open('static/catch_data.json', 'w'))
+                        time.sleep(1)
             #logging.critical(snipe.captured_pokemon_id)
             #if args.zslocation == False:
              #   reDo = raw_input('Shall we do this again(yes or no)?')
@@ -255,7 +287,9 @@ def doSnipe(session,args,snipeLoc):
 		
 if __name__ == '__main__':
     
-	
+    data = [{'status':'Server startup. Nothing to report.'}]
+    json.dump(data, open('static/catch_data.json', 'w'))
+    time.sleep(1)
     setupLogger()
     logging.debug('Logger set up')
 
@@ -294,6 +328,7 @@ if __name__ == '__main__':
     # Time to show off what we can do
     logging.info("Successfully logged in to Pokemon Go! Starting web server on port 5100.")
     app.run(host='0.0.0.0', port=5100)
+    url_for('static', filename='catch_data.json')
     	
     
 	
