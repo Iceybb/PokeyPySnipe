@@ -4,6 +4,7 @@ import logging
 import time
 import sys
 import json
+import configparser
 
 from custom_exceptions import GeneralPogoException
 
@@ -21,29 +22,28 @@ import thread
 import subprocess
 import os
 import sys
-global ignoreCP 
-ignoreCP = False
+
 
 app = Flask(__name__)
 
 @app.route('/_snipe_')
 def remote_Snipe():
-    
+    global ignoreCP
     
     snipecoords = request.args.get('snipecoords', 0)
     pokemonName = request.args.get('pokemonName', 0)
     igCP = request.args.get('ignoreCP',0)
     
     if str(igCP) == str('ignoreCP'):
-        global ignoreCP
+        
         ignoreCP  = True
     else:
-        global ignoreCP
+        
         ignoreCP = False
         
 
     
-    doSnipe(session,args,snipecoords,pokemonName)
+    doSnipe(session,config,snipecoords,pokemonName)
    
     
     
@@ -77,7 +77,7 @@ def getProfile(session):
 
 
 # Grab the nearest pokemon details
-def findBestPokemon(session,args,firstTry,pokemonName):
+def findBestPokemon(session,config,firstTry,pokemonName):
     # Get Map details and print pokemon
     logging.info("Finding Nearby Pokemon:")
     cells = session.getMapObjects()
@@ -138,7 +138,7 @@ def findBestPokemon(session,args,firstTry,pokemonName):
         json.dump(data, open('static/catch_data.json', 'w'))
         if firstTry == True:
             logging.info("Didn't find any, but sometimes this is a bug - let's retry.")
-            pokemonBest = findBestPokemon(session,args,False,pokemonName)
+            pokemonBest = findBestPokemon(session,config,False,pokemonName)
         else:    
             logging.info("Sorry charlie, no Pokemon here. Enter a new location.")
         
@@ -232,25 +232,17 @@ def getInventory(session):
     logging.info(session.getInventory())
 
 
-def doSnipe(session,args,snipeLoc,pokemonName):
+def doSnipe(session,config,snipeLoc,pokemonName):
     if pokemonName == "":
         pokemonName = 'any'
     if session:
 	
-        #if args.zslocation:
-            #snipeLoc = args.zslocation
-        #else:
-            #snipeLoc = raw_input('Please paste target location (format is lat,lng)!: ')
-        snipeLocSplit = snipeLoc.split(",")
-        # General
-        #getProfile(session)
-        #getInventory(session)
-
+        
         # Things we need GPS for
-        if args.location:
+        if config.get('CONFIG','startLoc'):
 			#Set up home location
             prevLatitude, prevLongitude, _ = session.getCoordinates()
-
+            snipeLocSplit = snipeLoc.split(",")
             #Set up snipe location
             snipeLatitude = float(snipeLocSplit[0])
             snipeLongitude = float(snipeLocSplit[1])
@@ -260,7 +252,7 @@ def doSnipe(session,args,snipeLoc,pokemonName):
             session.setCoordinates(snipeLatitude,snipeLongitude)
 			
 			#Search snipe location for most powerful pokemon
-            pokeMon = findBestPokemon(session,args,True,pokemonName)
+            pokeMon = findBestPokemon(session,config,True,pokemonName)
             
             if pokeMon == None:
                 session.setCoordinates(prevLatitude,prevLongitude)
@@ -311,53 +303,50 @@ def doSnipe(session,args,snipeLoc,pokemonName):
                                }]
                         json.dump(data, open('static/catch_data.json', 'w'))
                         time.sleep(1)
-            #logging.critical(snipe.captured_pokemon_id)
-            #if args.zslocation == False:
-             #   reDo = raw_input('Shall we do this again(yes or no)?')
-              #  if reDo.upper() == "YES":
-               #     doSnipe(session,args)
+          
     else:
         logging.critical('Session not created successfully')
 
 		
 if __name__ == '__main__':
-    
+    global ignoreCP 
+    ignoreCP = False
     data = [{'status':'Server startup. Nothing to report.'}]
     json.dump(data, open('static/catch_data.json', 'w'))
     time.sleep(1)
     setupLogger()
     logging.debug('Logger set up')
 
-    # Read in args
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-a", "--auth", help="Auth Service", required=True)
-    parser.add_argument("-u", "--username", help="Username", required=True)
-    parser.add_argument("-p", "--password", help="Password", required=True)
-    parser.add_argument("-l", "--location", help="Location")
-    parser.add_argument("-z", "--zslocation", help="Lat")
-    parser.add_argument("-g", "--geo_key", help="GEO API Secret")
-    parser.add_argument("-m", "--minCP", help="Minimum CP")
-    args = parser.parse_args()
-    logging.info(str(args.zslocation))
+    	
+	#parse in configuration from config.ini
+    config = configparser.ConfigParser()
+    config.sections()
+    config.read('config.ini')
+    #config.get('AUTH','type')
+    #config.get('AUTH','username')
+    #config.get('AUTH','password')
+    #config.get('CONFIG','startLoc')
+    #config.get('CONFIG','minCP')
+    
     # Check service
-    minCP = int(args.minCP)
-    if args.auth not in ['ptc', 'google']:
-        logging.error('Invalid auth service {}'.format(args.auth))
+    minCP = int(config.get('CONFIG','minCP'))
+    if config.get('AUTH','type') not in ['ptc', 'google']:
+        logging.error('Invalid auth service {}'.format(config.get('AUTH','type')))
         sys.exit(-1)
 
     # Create PokoAuthObject
     poko_session = PokeAuthSession(
-        args.username,
-        args.password,
-        args.auth,
-        geo_key=args.geo_key
+        config.get('AUTH','username'),
+        config.get('AUTH','password'),
+        config.get('AUTH','type'),
+        geo_key=""
     )
 
     # Authenticate with a given location
     # Location is not inherent in authentication
     # But is important to session
-    if args.location:
-        session = poko_session.authenticate(locationLookup=args.location)
+    if config.get('CONFIG','startLoc'):
+        session = poko_session.authenticate(locationLookup=config.get('CONFIG','startLoc'))
     else:
         session = poko_session.authenticate()
 

@@ -1,1 +1,3 @@
-snipe.py -a "ptc" -u "user" -p "password" -l "central park, ny" --minCP 0
+@echo off
+TITLE  PokeyPy Sniper
+snipe.py
