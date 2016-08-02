@@ -1,1 +1,1 @@
-snipe.py -a "ptc" -u "user" -p "password" -l "central park, ny" -m 9999
+snipe.py -a "ptc" -u "user" -p "password" -l "central park, ny" --minCP 0
