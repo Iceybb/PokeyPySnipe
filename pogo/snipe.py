@@ -21,7 +21,8 @@ import thread
 import subprocess
 import os
 import sys
-
+global ignoreCP 
+ignoreCP = False
 
 app = Flask(__name__)
 
@@ -31,11 +32,20 @@ def remote_Snipe():
     
     snipecoords = request.args.get('snipecoords', 0)
     pokemonName = request.args.get('pokemonName', 0)
+    igCP = request.args.get('ignoreCP',0)
+    
+    if str(igCP) == str('ignoreCP'):
+        global ignoreCP
+        ignoreCP  = True
+    else:
+        global ignoreCP
+        ignoreCP = False
+        
+
+    
     doSnipe(session,args,snipecoords,pokemonName)
    
     
-    #workDir = os.path.dirname(os.path.realpath(sys.argv[0]))
-    #subprocess.Popen([workDir + r'\snipeparam.bat',authtype,username,password,str(startingloc),str(snipecoords)], creationflags = subprocess.CREATE_NEW_CONSOLE)
     
     return render_template('result.html')
 
@@ -264,16 +274,19 @@ def doSnipe(session,args,snipeLoc,pokemonName):
             session.setCoordinates(prevLatitude,prevLongitude)
             logging.info("Encountered pokemon - moving back to start location to catch.")
 			#Wait for move to complete
+            logging.info('Ignore CP: ' + str(ignoreCP))
             time.sleep(2)
-            if remoteEncounter.wild_pokemon.pokemon_data.cp < args.minCP:
-                data = [{
-                'status': 'fail',
-                'message': 'Did not attempt to catch ' +  pokedex[remoteEncounter.wild_pokemon.pokemon_data.pokemon_id] + ': CP of ' + str(remoteEncounter.wild_pokemon.pokemon_data.cp)  + ' did not meet threshold of ' + str(args.minCP) + '.'
-                }]
+            if ignoreCP == False:
+            
+                if int(remoteEncounter.wild_pokemon.pokemon_data.cp) < int(minCP):
+                    data = [{
+                    'status': 'fail',
+                    'message': 'Did not attempt to catch ' +  pokedex[remoteEncounter.wild_pokemon.pokemon_data.pokemon_id] + ': CP of ' + str(remoteEncounter.wild_pokemon.pokemon_data.cp)  + ' did not meet threshold of ' + str(minCP) + '.'
+                    }]
                         
-                json.dump(data, open('static/catch_data.json', 'w'))
-                logging.critical('Did not attempt to catch ' +  pokedex[remoteEncounter.wild_pokemon.pokemon_data.pokemon_id] + ': CP of ' + str(remoteEncounter.wild_pokemon.pokemon_data.cp)  + ' did not meet threshold of ' + str(args.minCP) + '.')
-                return
+                    json.dump(data, open('static/catch_data.json', 'w'))
+                    logging.critical('Did not attempt to catch ' +  pokedex[remoteEncounter.wild_pokemon.pokemon_data.pokemon_id] + ': CP of ' + str(remoteEncounter.wild_pokemon.pokemon_data.cp)  + ' did not meet threshold of ' + str(minCP) + '.')
+                    return
                 
             snipe = snipeABitch(session, pokeMon, remoteEncounter)
             if snipe.status == 3:
@@ -327,7 +340,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
     logging.info(str(args.zslocation))
     # Check service
-    
+    minCP = int(args.minCP)
     if args.auth not in ['ptc', 'google']:
         logging.error('Invalid auth service {}'.format(args.auth))
         sys.exit(-1)
