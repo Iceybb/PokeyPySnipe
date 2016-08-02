@@ -10,12 +10,12 @@ Instructions:
 *After install, copy requirements.txt to c:\python27\scripts, open command prompt and type pip install -r requirements.txt
 --if you get an error installing flask, run this command and retry installing the requirements: pip install setuptools==21.2.1
 
-*Edit \pogo\snipe.bat with your auth type, username, password and current location (if using google, you MUST put your gmail address / password in the bat file for it to authenticate)
+*Edit \pogo\config.ini with your auth type, username, password and current location (if using google, you MUST put your gmail address / password in the bat file for it to authenticate). MinCP setting, if left at 0, will catch all Pokemon. Adjust to your preference. 
 
 *Run snipe.bat
 
 *After you get the message stating that web server is running on port 5100, navigate to http://localhost:5100
 
-*Paste snipe coordinates (must be xxx.xxxxxx,xxx.xxxxxx format - xxx,xxxxx:xxx,xxxxxxx and other formats do not work at this time)
+*Paste snipe coordinates (must be xxx.xxxxxx,xxx.xxxxxx format - xxx,xxxxx:xxx,xxxxxxx and other formats do not work at this time). Optionally, you can enter the name of a Pokemon to catch at this location - if left blank, the rarest Pokemon at the location will be caught automatically. If you check the 'Ignore CP' box, it will catch the Pokemon regardless of CP (Good for Pokedex filling)
 
 
