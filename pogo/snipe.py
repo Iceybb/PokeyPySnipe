@@ -166,16 +166,50 @@ def snipeABitch(session, pokemon, encounter, thresholdP=0.5, limit=10, delay=2):
     while True:
         bestBall = items.UNKNOWN
         altBall = items.UNKNOWN
-
+        #logging.info("Poke Balls: " + str(pokeBalls) + " Great Balls: " + str(greatBalls) + " Ultra Balls: " + str(ultraBalls))
         # Check for balls and see if we pass
         # wanted threshold
-        for i in range(len(balls)):
-            if balls[i] in bag and bag[balls[i]] > 0:
-                altBall = balls[i]
-                if chances[i] > thresholdP:
-                    bestBall = balls[i]
-                    break
-
+        logging.critical(balls)
+        bag = session.checkInventory().bag
+        
+        ballTypes = {1:'Poke Ball',2:'Great Ball',3:'Ultra Ball'}
+        for i in range(1,len(balls)+1):
+            if i in bag and bag[i] > 0:
+                if i == 1:
+                    #PokeBalls
+                    pokeBalls = bag[i]
+                    logging.info("We have " + str(bag[i]) + " Poke Balls")
+                    if chances[i] > thresholdP:
+                        bestBall = i
+                        break
+                    else:
+                        bestBall = i
+                        altBall = i
+                elif i == 2:
+                    #GreatBalls
+                    greatBalls = bag[i]
+                    logging.info("We have " + str(bag[i]) + " Great Balls")
+                    if float(chances[i]) > float(thresholdP):
+                        bestBall = i
+                        break
+                    else:
+                        if i-1 in bag and bag[i-1] > 0:
+                            altBall = i-1
+                            bestBall = i
+                            
+                elif i == 3:
+                    #UltraBalls
+                    ultraBalls = bag[i]
+                    bestBall = i
+                    logging.info("We have " + str(bag[i]) + " Ultra Balls")
+                    if i-1 in bag and bag[i-1] > 0:
+                        altBall = i-1
+                        
+                        
+        if bestBall != items.UNKNOWN and altBall != items.UNKNOWN:
+            logging.critical("Best ball: " + ballTypes[bestBall] + " Alt Ball: " + ballTypes[altBall])
+        elif bestball != items.UNKNOWN:
+            logging.critical("Best ball: " + ballTypes[bestBall] + " Alt Ball: NONE!")
         # If we can't determine a ball, try a berry
         # or use a lower class ball
         if bestBall == items.UNKNOWN:
@@ -352,6 +386,8 @@ if __name__ == '__main__':
 
     # Time to show off what we can do
     logging.info("Successfully logged in to Pokemon Go! Starting web server on port 5100.")
+    
+    
     app.run(host='0.0.0.0', port=5100)
     url_for('static', filename='catch_data.json')
     	
