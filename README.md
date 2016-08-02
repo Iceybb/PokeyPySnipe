@@ -8,11 +8,11 @@ Instructions:
 *Install python 2.7.12 from here: https://www.python.org/downloads/
 
 *After install, copy requirements.txt to c:\python27\scripts, open command prompt and type pip install -r requirements.txt
---if you get an error installing flask, run this command and retry installing the requirements: pip install setuptools==21.2.1
 
-*Edit \pogo\config.ini with your auth type, username, password and current location (if using google, you MUST put your gmail address / password in the bat file for it to authenticate). MinCP setting, if left at 0, will catch all Pokemon. Adjust to your preference. 
 
-*Run snipe.bat
+*Edit \pogo\config.ini with your auth type, username, password and current location (if using google, you MUST put your gmail address / password in the config.ini file for it to authenticate). MinCP setting, if left at 0, will catch all Pokemon. Adjust to your preference. 
+
+*Run launch.bat
 
 *After you get the message stating that web server is running on port 5100, navigate to http://localhost:5100
 
