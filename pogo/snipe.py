@@ -84,7 +84,8 @@ def findBestPokemon(session,config,firstTry,pokemonName):
     closest = float("Inf")
     best = -1
     pokemonBest = None
-    
+    #logging.critical("We seem to have problems right here..throttling sucks. Let's wait a few seconds.")
+    #time.sleep(7)
     latitude, longitude, _ = session.getCoordinates()
     logging.info("Current pos: %f, %f" % (latitude, longitude))
     for cell in cells.map_cells:
@@ -132,22 +133,23 @@ def findBestPokemon(session,config,firstTry,pokemonName):
         else:
             logging.info(pokedex[pokemonBest.pokemon_data.pokemon_id] + " appears to be the rarest Pokemon @ location. Let's catch him!")
     else:
-        data = [{
-                'status': 'Did not find any pokemon @ given location.'
-                }]
-        json.dump(data, open('static/catch_data.json', 'w'))
+       
         if firstTry == True:
-            logging.info("Didn't find any, but sometimes this is a bug - let's retry.")
+            
             pokemonBest = findBestPokemon(session,config,False,pokemonName)
         else:    
             logging.info("Sorry charlie, no Pokemon here. Enter a new location.")
+            data = [{
+                'status': 'Did not find any pokemon @ given location.'
+            }]
+            json.dump(data, open('static/catch_data.json', 'w'))
         
    
     return pokemonBest
 
 
 #Snipe!
-def snipeABitch(session, pokemon, encounter, thresholdP=0.5, limit=10, delay=2):
+def snipeABitch(session, pokemon, encounter, thresholdP=0.5, limit=25, delay=2):
     # Start encounter
     
 
@@ -181,6 +183,7 @@ def snipeABitch(session, pokemon, encounter, thresholdP=0.5, limit=10, delay=2):
                     logging.info("We have " + str(bag[i]) + " Poke Balls")
                     if chances[i] > thresholdP:
                         bestBall = i
+                        logging.info("Poke Ball catch probability is above threshold of .5.")
                         break
                     else:
                         bestBall = i
@@ -191,6 +194,7 @@ def snipeABitch(session, pokemon, encounter, thresholdP=0.5, limit=10, delay=2):
                     logging.info("We have " + str(bag[i]) + " Great Balls")
                     if float(chances[i]) > float(thresholdP):
                         bestBall = i
+                        logging.info("Great Ball catch probability is above threshold of .5.")
                         break
                     else:
                         if i-1 in bag and bag[i-1] > 0:
@@ -201,6 +205,7 @@ def snipeABitch(session, pokemon, encounter, thresholdP=0.5, limit=10, delay=2):
                     #UltraBalls
                     ultraBalls = bag[i]
                     bestBall = i
+                    logging.info("No ball's catch probability is above threshold of .5, defaulting to Ultra Ball.")
                     logging.info("We have " + str(bag[i]) + " Ultra Balls")
                     if i-1 in bag and bag[i-1] > 0:
                         altBall = i-1
@@ -232,8 +237,7 @@ def snipeABitch(session, pokemon, encounter, thresholdP=0.5, limit=10, delay=2):
                 time.sleep(1)
                 raise GeneralPogoException("Out of usable balls")
                 
-            else:
-                bestBall = altBall
+             
 
         # Try to catch it!!
         logging.info("Using a %s" % items[bestBall])
