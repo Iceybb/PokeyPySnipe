@@ -26,7 +26,7 @@ import sys
 
 app = Flask(__name__)
 
-@app.route('/_snipe_')
+@app.route('/snipe')
 def remote_Snipe():
     global ignoreCP
     
@@ -169,7 +169,7 @@ def snipeABitch(session, pokemon, encounter, thresholdP=0.5, limit=10, delay=2):
         #logging.info("Poke Balls: " + str(pokeBalls) + " Great Balls: " + str(greatBalls) + " Ultra Balls: " + str(ultraBalls))
         # Check for balls and see if we pass
         # wanted threshold
-        logging.critical(balls)
+        
         bag = session.checkInventory().bag
         
         ballTypes = {1:'Poke Ball',2:'Great Ball',3:'Ultra Ball'}
@@ -212,7 +212,9 @@ def snipeABitch(session, pokemon, encounter, thresholdP=0.5, limit=10, delay=2):
             logging.critical("Best ball: " + ballTypes[bestBall] + " Alt Ball: NONE!")
         # If we can't determine a ball, try a berry
         # or use a lower class ball
-        if bestBall == items.UNKNOWN:
+        
+        if int(encounter.wild_pokemon.pokemon_data.cp) >= int(useBerryThreshold):
+            
             if not berried and items.RAZZ_BERRY in bag and bag[items.RAZZ_BERRY]:
                 logging.info("Using a RAZZ_BERRY")
                 session.useItemCapture(items.RAZZ_BERRY, pokemon)
@@ -344,6 +346,7 @@ def doSnipe(session,config,snipeLoc,pokemonName):
 		
 if __name__ == '__main__':
     global ignoreCP 
+    global useBerryThreshold
     ignoreCP = False
     data = [{'status':'Server startup. Nothing to report.'}]
     json.dump(data, open('static/catch_data.json', 'w'))
@@ -361,8 +364,9 @@ if __name__ == '__main__':
     #config.get('AUTH','password')
     #config.get('CONFIG','startLoc')
     #config.get('CONFIG','minCP')
-    
+    #config.get('CONFIG','useBerryThreshold')
     # Check service
+    useBerryThreshold = config.get('CONFIG','useBerryThreshold')
     minCP = int(config.get('CONFIG','minCP'))
     if config.get('AUTH','type') not in ['ptc', 'google']:
         logging.error('Invalid auth service {}'.format(config.get('AUTH','type')))
