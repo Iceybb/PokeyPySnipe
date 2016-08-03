@@ -208,7 +208,7 @@ def snipeABitch(session, pokemon, encounter, thresholdP=0.5, limit=10, delay=2):
                         
         if bestBall != items.UNKNOWN and altBall != items.UNKNOWN:
             logging.critical("Best ball: " + ballTypes[bestBall] + " Alt Ball: " + ballTypes[altBall])
-        elif bestball != items.UNKNOWN:
+        elif bestBall != items.UNKNOWN:
             logging.critical("Best ball: " + ballTypes[bestBall] + " Alt Ball: NONE!")
         # If we can't determine a ball, try a berry
         # or use a lower class ball
